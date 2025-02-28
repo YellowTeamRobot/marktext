@@ -21,7 +21,7 @@ Renderer.prototype.frontmatter = function (text) {
 
   let html = ''
 
-  // Title as <title> and <h1>
+  // Title
   if (frontMatter.title) {
     html += `<h1 class='front-matter-title'>${frontMatter.title}</h1>\n`
   }
