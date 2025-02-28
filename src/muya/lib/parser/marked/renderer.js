@@ -1,5 +1,6 @@
 import defaultOptions from './options'
 import { cleanUrl, escape } from './utils'
+import yaml from './libs/js-yaml.min.js'
 
 /**
  * Renderer
@@ -10,7 +11,56 @@ function Renderer (options = {}) {
 }
 
 Renderer.prototype.frontmatter = function (text) {
-  return `<pre class="front-matter">\n${text}</pre>\n`
+  let frontMatter
+  try {
+    frontMatter = yaml.load(text)
+  } catch (e) {
+    console.error('Error parsing front matter:', e)
+    return `<pre class="front-matter">\n${text}</pre>\n` // Fallback to raw display
+  }
+
+  let html = ''
+
+  // Title as <title> and <h1>
+  if (frontMatter.title) {
+    html += `<h1 class='front-matter-title'>${frontMatter.title}</h1>\n`
+  }
+
+  // Subtitle
+  if (frontMatter.subtitle) {
+    html += `<div class='front-matter-subtitle'>${frontMatter.subtitle}</div>\n`
+  }
+
+  // Author(s)
+  if (frontMatter.author) {
+    if (Array.isArray(frontMatter.author)) {
+      frontMatter.author.forEach(author => {
+        html += `<div class='front-matter-author'>${author}</div>\n`
+      })
+    } else {
+      html += `<div class='front-matter-author'>${frontMatter.author}</div>\n`
+    }
+  }
+
+  // Date (formatted)
+  if (frontMatter.date) {
+    try {
+      const dateObj = new Date(frontMatter.date)
+      const formattedDate = dateObj.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      })
+      html += `<div class='front-matter-date'>${formattedDate}</div>\n`
+    } catch (e) {
+      console.error('Invalid date format:', frontMatter.date)
+    }
+  }
+
+  // Add a horizontal rule at the end
+  html += `<hr class='front-matter-hr'>\n`
+
+  return html
 }
 
 Renderer.prototype.multiplemath = function (text) {
