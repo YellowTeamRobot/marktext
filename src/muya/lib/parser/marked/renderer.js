@@ -49,7 +49,8 @@ Renderer.prototype.frontmatter = function (text) {
       const formattedDate = dateObj.toLocaleDateString('en-US', {
         year: 'numeric',
         month: 'long',
-        day: 'numeric'
+        day: 'numeric',
+        timeZone: 'UTC'
       })
       html += `<div class='front-matter-date'>${formattedDate}</div>\n`
     } catch (e) {
